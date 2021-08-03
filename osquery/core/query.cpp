@@ -95,15 +95,16 @@ bool Query::isNewQuery() const {
 void Query::getQueryStatus(uint64_t epoch,
                            bool& fresh_results,
                            bool& new_query) const {
+  uint64_t previous_epoch = getPreviousEpoch();
   if (!isQueryNameInDatabase()) {
     // This is the first encounter of the scheduled query.
     fresh_results = true;
     new_query = true;
     LOG(INFO) << "Storing initial results for new scheduled query: " << name_;
     saveQuery(name_, query_);
-  } else if (getPreviousEpoch() != epoch) {
+  } else if (previous_epoch != epoch) {
     fresh_results = true;
-    LOG(INFO) << "New Epoch " << epoch << " for scheduled query " << name_;
+    LOG(INFO) << "New Epoch " << epoch << " for scheduled query " << name_ << " (previous " << previous_epoch << ")";
   } else if (isNewQuery()) {
     // This query is 'new' in that the previous results may be invalid.
     new_query = true;
